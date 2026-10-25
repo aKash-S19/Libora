@@ -33,14 +33,25 @@ import {
   Firestore,
 } from 'firebase/firestore';
 
-// Client-side Firebase config loaded strictly from environment variables
+// Client-side Firebase config
 const firebaseConfig = {
+  // NOTE: Add your Firebase Web API Key here when running locally, or pass via EXPO_PUBLIC_FIREBASE_API_KEY in .env
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || '',
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '',
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '',
+  authDomain:
+    process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    'inkshelf-8d806.firebaseapp.com',
+  projectId:
+    process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ||
+    'inkshelf-8d806',
+  storageBucket:
+    process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    'inkshelf-8d806.firebasestorage.app',
+  messagingSenderId:
+    process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+    '711418085439',
+  appId:
+    process.env.EXPO_PUBLIC_FIREBASE_APP_ID ||
+    '1:711418085439:web:d93e9d78a79bde40a3f88a',
 };
 
 let app: FirebaseApp | null = null;

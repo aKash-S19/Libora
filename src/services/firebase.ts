@@ -49,22 +49,24 @@ let db: Firestore | null = null;
 let isFirebaseConfigured = false;
 
 try {
-  if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApp();
-  }
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0) {
+    if (getApps().length === 0) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
 
-  try {
-    auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    });
-  } catch {
-    auth = getAuth(app);
-  }
+    try {
+      auth = initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
+    } catch {
+      auth = getAuth(app);
+    }
 
-  db = getFirestore(app);
-  isFirebaseConfigured = true;
+    db = getFirestore(app);
+    isFirebaseConfigured = true;
+  }
 } catch (e) {
   console.warn('Firebase initialization in offline mode:', e);
 }
@@ -116,10 +118,8 @@ export class FirebaseAuthService {
   }
 
   static async signUp(email: string, pass: string, username: string, fullName?: string): Promise<User> {
-    if (!auth) throw new Error('Firebase Auth is not initialized');
-
-    try {
-      if (isFirebaseConfigured) {
+    if (auth && isFirebaseConfigured) {
+      try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const user = userCredential.user;
 
@@ -140,15 +140,15 @@ export class FirebaseAuthService {
         }
 
         return user;
-      }
-    } catch (error: any) {
-      if (
-        error?.code === 'auth/invalid-api-key' ||
-        error?.code === 'auth/api-key-not-valid'
-      ) {
-        // Fall back to simulation below
-      } else {
-        throw new Error(formatAuthError(error));
+      } catch (error: any) {
+        if (
+          error?.code === 'auth/invalid-api-key' ||
+          error?.code === 'auth/api-key-not-valid'
+        ) {
+          // Fall back to simulation below
+        } else {
+          throw new Error(formatAuthError(error));
+        }
       }
     }
 
@@ -164,21 +164,19 @@ export class FirebaseAuthService {
   }
 
   static async signIn(email: string, pass: string): Promise<User> {
-    if (!auth) throw new Error('Firebase Auth is not initialized');
-
-    try {
-      if (isFirebaseConfigured) {
+    if (auth && isFirebaseConfigured) {
+      try {
         const userCredential = await signInWithEmailAndPassword(auth, email, pass);
         return userCredential.user;
-      }
-    } catch (error: any) {
-      if (
-        error?.code === 'auth/invalid-api-key' ||
-        error?.code === 'auth/api-key-not-valid'
-      ) {
-        // Fall back to simulation below
-      } else {
-        throw new Error(formatAuthError(error));
+      } catch (error: any) {
+        if (
+          error?.code === 'auth/invalid-api-key' ||
+          error?.code === 'auth/api-key-not-valid'
+        ) {
+          // Fall back to simulation below
+        } else {
+          throw new Error(formatAuthError(error));
+        }
       }
     }
 
@@ -206,10 +204,8 @@ export class FirebaseAuthService {
   }
 
   static async signInWithGoogle(): Promise<User> {
-    if (!auth) throw new Error('Firebase Auth is not initialized');
-
-    try {
-      if (isFirebaseConfigured) {
+    if (auth && isFirebaseConfigured) {
+      try {
         const provider = new GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
@@ -286,8 +282,8 @@ export class FirebaseAuthService {
   }
 
   static async signInWithGoogleCredential(idToken: string): Promise<User> {
-    if (!auth) throw new Error('Firebase Auth is not initialized');
-    try {
+    if (auth && isFirebaseConfigured) {
+      try {
       const credential = GoogleAuthProvider.credential(idToken);
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
@@ -316,6 +312,17 @@ export class FirebaseAuthService {
     } catch (error: any) {
       throw new Error(formatAuthError(error));
     }
+  }
+
+    const simGoogleUser = {
+      uid: 'google_user_' + Math.random().toString(36).substring(2, 9),
+      email: 'google.reader@gmail.com',
+      displayName: 'Google Reader',
+      photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120',
+      isAnonymous: false,
+    } as unknown as User;
+
+    return simGoogleUser;
   }
 
   static async signOut(): Promise<void> {

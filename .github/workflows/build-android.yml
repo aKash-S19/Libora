@@ -1,0 +1,89 @@
+name: Build Libora Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: 1. Validate & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🔍 TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: 🧹 Linting Check
+        run: npx expo lint
+
+      - name: 🧪 Automated Unit Tests
+        run: npm test
+
+  build-android:
+    name: 2. Build Android APK
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: ⚙️ Generate Android Native Project (Expo Prebuild)
+        run: npx expo prebuild --platform android --clean
+
+      - name: 🔨 Build Android APK via Gradle
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+
+      - name: 📤 Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libora-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: 📋 Report Build Summary
+        run: |
+          echo "### 🚀 Libora Android Build Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "The APK artifact **libora-debug-apk** has been built and uploaded successfully." >> $GITHUB_STEP_SUMMARY
+          echo "- **Package:** com.libora.app" >> $GITHUB_STEP_SUMMARY
+          echo "- **Architecture:** Universal Android APK" >> $GITHUB_STEP_SUMMARY
+          echo "- **Download:** Check the Artifacts section of this workflow run to download and install on any Android device." >> $GITHUB_STEP_SUMMARY

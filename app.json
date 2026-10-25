@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Libora",
+    "slug": "libora",
+    "scheme": "libora",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.libora.app"
+    },
+    "android": {
+      "package": "com.libora.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FAF8F5",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sharing",
+      "expo-document-picker",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "35ab3852-8a96-4382-89f2-45e36c61a04d"
+      }
+    }
+  }
+}

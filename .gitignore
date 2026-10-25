@@ -1,0 +1,67 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# Dependencies
+node_modules/
+
+# Expo & Web
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native & Builds
+/ios
+/android
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.keystore
+*.mobileprovision
+*.apk
+*.aab
+*.ipa
+
+# Metro
+.metro-health-check*
+
+# Environment & Secret files
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Logs & Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+bun-debug.*
+*.log
+
+# Editor & IDE directories
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# AI / Assistant tool caches
+.claude/
+
+# System / OS
+.DS_Store
+*.pem
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# TypeScript & Test
+*.tsbuildinfo
+coverage/

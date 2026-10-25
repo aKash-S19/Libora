@@ -276,9 +276,9 @@ export class FirebaseAuthService {
         }
 
         return user;
+      } catch (error: any) {
+        throw new Error(formatAuthError(error));
       }
-    } catch (error: any) {
-      throw new Error(formatAuthError(error));
     }
 
     const simGoogleUser = {
@@ -295,35 +295,35 @@ export class FirebaseAuthService {
   static async signInWithGoogleCredential(idToken: string): Promise<User> {
     if (auth && isFirebaseConfigured) {
       try {
-      const credential = GoogleAuthProvider.credential(idToken);
-      const userCredential = await signInWithCredential(auth, credential);
-      const user = userCredential.user;
+        const credential = GoogleAuthProvider.credential(idToken);
+        const userCredential = await signInWithCredential(auth, credential);
+        const user = userCredential.user;
 
-      if (db) {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const snap = await getDoc(userDocRef);
-          if (!snap.exists()) {
-            await setDoc(userDocRef, {
-              id: user.uid,
-              email: user.email || '',
-              username: (user.displayName || 'reader').toLowerCase().replace(/\s+/g, '_'),
-              displayName: user.displayName || 'Reader',
-              avatarUrl: user.photoURL || null,
-              createdAt: Date.now(),
-              isPrivate: false,
-            });
+        if (db) {
+          try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const snap = await getDoc(userDocRef);
+            if (!snap.exists()) {
+              await setDoc(userDocRef, {
+                id: user.uid,
+                email: user.email || '',
+                username: (user.displayName || 'reader').toLowerCase().replace(/\s+/g, '_'),
+                displayName: user.displayName || 'Reader',
+                avatarUrl: user.photoURL || null,
+                createdAt: Date.now(),
+                isPrivate: false,
+              });
+            }
+          } catch (e) {
+            console.warn('Could not sync Google user profile to Firestore:', e);
           }
-        } catch (e) {
-          console.warn('Could not sync Google user profile to Firestore:', e);
         }
-      }
 
-      return user;
-    } catch (error: any) {
-      throw new Error(formatAuthError(error));
+        return user;
+      } catch (error: any) {
+        throw new Error(formatAuthError(error));
+      }
     }
-  }
 
     const simGoogleUser = {
       uid: 'google_user_' + Math.random().toString(36).substring(2, 9),
